@@ -1,0 +1,38 @@
+prometheus:
+  prometheusSpec:
+    nodeSelector:
+      mylabel: "enabled"
+    resources:
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+
+grafana:
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "500Mi"
+      cpu: "200m"
+
+additionalPrometheusRulesMap:
+  rule-name:
+    groups:
+    - name: pod-restarts
+      rules:
+      - alert: PrometheusPodRestarted
+        expr: increase(kube_pod_container_status_restarts_total{pod="prometheus-prometheus-server"}[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.pod }} restart oldu."
+          description: "{{ $labels.pod }} 5 dakika içinde restart oldu."

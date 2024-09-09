@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    environment {
+        KUBECONFIG = '/var/jenkins_home/.kube/config'
+    }
+
+    stages {
+        stage('Apply') {
+            steps {
+                sh 'kubectl apply -f namespace.yaml'
+                sh 'kubectl apply -f dashboard-configmap.yaml'
+                sh 'kubectl apply -f ingress.yaml'
+            }
+        }
+
+        stage('Helm Deploy') {
+            steps {
+                sh 'helm repo add prometheus-community https://prometheus-community.github.io/helm-charts'
+                sh 'helm repo update'
+                sh 'helm upgrade --install prometheus-stack prometheus-community/kube-prometheus-stack --namespace monitoring -f overrideValues.yaml --create-namespace'
+            }
+        }
+    }
+}

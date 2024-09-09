@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    environment {
+        KUBECONFIG = '/var/jenkins_home/.kube/config'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'docker login -u $HARBOR_USER -p $HARBOR_PASS $HARBOR_IP'
+                sh 'docker build -t myapp:$BUILD_ID .'
+                sh 'docker tag myapp:$BUILD_ID $HARBOR_IP/myproject/myapp:$BUILD_ID'
+                sh 'docker push $HARBOR_IP/myproject/myapp:$BUILD_ID'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'helm upgrade --install myapp ./chart -n myapp --create-namespace --set image=$HARBOR_IP/myproject/myapp --set tag=$BUILD_ID'
+            }
+        }
+    }
+}

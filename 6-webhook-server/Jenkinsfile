@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+
+    environment {
+        KUBECONFIG = '/var/jenkins_home/.kube/config'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'docker login -u $HARBOR_USER -p $HARBOR_PASS $HARBOR_IP'
+                sh 'docker build -t webhook:$BUILD_ID .'
+                sh 'docker tag webhook:$BUILD_ID $HARBOR_IP/myproject/webhook:$BUILD_ID'
+                sh 'docker push $HARBOR_IP/myproject/webhook:$BUILD_ID'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'kubectl delete -f webhook.yaml --ignore-not-found=true'
+                sh 'kubectl apply -f perms.yaml'
+                sh 'kubectl apply -f configmap.yaml'
+                sh 'helm upgrade --install webhook ./chart -n webhook --create-namespace --set image=$HARBOR_IP/myproject/webhook --set tag=$BUILD_ID'
+                sh 'kubectl apply -f webhook.yaml'
+            }
+        }
+    }
+}

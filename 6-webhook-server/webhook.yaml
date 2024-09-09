@@ -1,0 +1,48 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: cpu-limit-webhook
+webhooks:
+  - name: cpulimit.base.local
+    rules:
+      - operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        resources: ["deployments"]
+    clientConfig:
+      service:
+        name: webhook
+        namespace: webhook
+        path: "/validate"
+        port: 8443
+      caBundle: |
+        LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURWVENDQWoyZ0F3SUJBZ0lVU1pPOHdzTStF
+        RXlJYVRUZWVOL2NqV0JVSUxnd0RRWUpLb1pJaHZjTkFRRUwKQlFBd0hqRWNNQm9HQTFVRUF3d1Rk
+        MlZpYUc5dmF5NTNaV0pvYjI5ckxuTjJZekFlRncweU5EQTVNRGd5TWpJMQpOVEZhRncweU5UQTVN
+        RGd5TWpJMU5URmFNQjR4SERBYUJnTlZCQU1NRTNkbFltaHZiMnN1ZDJWaWFHOXZheTV6CmRtTXdn
+        Z0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDL2dzVk1MOFdBa0l2WXQr
+        bjQKWG00MjRWd2FQcUpsa2F6eFhvRGxRamc0YkFZM0hpZDVXdHArRTdWekpyRS9hR1ZRaGJjLy9K
+        VDV0L2JleTVwaAowSDVJUEExZm02dWZCZDY1TEpQTTFCVnNWTndoa0lwZnQrNFpNVG55SlFTMjNO
+        dzhjQnhVZFJLTSsvazZzbUhKCmhPU0Uwd2V0eG56ZkpKT0lXNXlIcWpnQWt6UGw5NEpyRDVTd1Jw
+        VmFmU21pRTJ2NjZMd1lqbjNyeEU2dTFHNk8KeVBxZzN0ZDZUR0hIc1NkT09kZGJkWWlVQVJ3NWU5
+        amk3V1lsOVozNFo1NFd5RVZ2TERNYzM3WEx0RllCOVkrYwptN0duZFM3cFJ6dk9TS3BmNHlhTEk0
+        T1ZkdlVwZU16UWxZNC9BWmRTdmZHQVpDSkRIbzhYTHVZRU52dGtKWnVsCkRvOERBZ01CQUFHamdZ
+        b3dnWWN3RGdZRFZSMFBBUUgvQkFRREFnV2dNQk1HQTFVZEpRUU1NQW9HQ0NzR0FRVUYKQndNQk1F
+        RUdBMVVkRVFRNk1EaUNFM2RsWW1odmIyc3VkMlZpYUc5dmF5NXpkbU9DSVhkbFltaHZiMnN1ZDJW
+        aQphRzl2YXk1emRtTXVZMngxYzNSbGNpNXNiMk5oYkRBZEJnTlZIUTRFRmdRVTN2dUxYbEVhc3RD
+        ak0za2JFZWNCCkptNTJMR013RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUJxa0R6eEd4dWE0SWNC
+        SVNtZDJTVnMzcDhZbENXbi8KMUJtVmRBalVXb1VmM0hCS2FhekxaSEZhcG1UUUpMTitpRklCNk5Y
+        V1BwM1k0ZHBxeS9Ca3RudkRkRzd5SFdocQpVSDhiUlE3cUVXcGJtOWQ4Z3Q3aGRvbGJzd3FPdWx6
+        ZnFrdlBLWkYzaGVSVmQ4Y1R0T2hvYmtJZEk0MHhQRUxSCjFOck1SMFdiV2trc0tRcTZUcElrVVA2
+        eTVvWC9GWFNrN2liTGora2VCYW1XQWRRNklaZktOcGJ4am54Ykg0VHEKZkoya25NR2l1ckdpTXBz
+        SGtEN0NablFVWjdpcG5IRTBrQXlMU1R2b0JnYVdvTnFTdXJ6VVJmdmdXWnc1K0Y4LwpHNXRjTk1R
+        WXJLRDFTcWI2Y29aRlJ4cmdHNkE5Uzd0Y1lzU1Z4NUZPYjB2aytFdFdkNG1IYWc4PQotLS0tLUVO
+        RCBDRVJUSUZJQ0FURS0tLS0tCg==
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5
+    namespaceSelector:
+        matchExpressions:
+          - key: webhook
+            operator: NotIn
+            values: ["namespace"]

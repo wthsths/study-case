@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook
+  template:
+    metadata:
+      labels:
+        app: webhook
+    spec:
+      containers:
+        - name: webhook
+          image: "{{ .Values.image }}:{{ .Values.tag }}"
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - name: tls-secret
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+      - name: tls-secret
+        secret:
+          secretName: webhook-tls

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    privileged: true
+    user: root
+    ports:
+    - 8080:8080
+    - 50000:50000
+    container_name: jenkins
+    volumes:
+    - /data/jenkins/jenkins_configuration:/var/jenkins_home
+    - /usr/bin/docker:/usr/bin/docker
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./3-prometheus-grafana-setup:/var/jenkins_home/workspace/3-prometheus-grafana-setup
+    - ~/.kube/config:/var/jenkins_home/.kube/config
+    - /usr/local/bin/kubectl:/usr/local/bin/kubectl
+    - /usr/local/bin/helm:/usr/local/bin/helm
+    - ./5-app:/var/jenkins_home/workspace/5-app
+    - ./6-webhook-server:/var/jenkins_home/workspace/6-webhook-server
+    environment:
+      HARBOR_IP: "192.168.1.7"
+      HARBOR_USER: "admin"
+      HARBOR_PASS: "Harbor12345"

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webhook-namespace-config
+data:
+  namespaces: |
+    myapp
